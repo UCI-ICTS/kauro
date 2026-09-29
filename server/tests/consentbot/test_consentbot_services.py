@@ -26,7 +26,7 @@ class ConsentServiceTests(TestCase):
         self.graph = self.script.script
         self.session_slug = str(self.invite.session_slug)
 
-    # TODO: Fix this with testing to check on completion flags. 
+    # TODO: Fix this with testing to check on completion flags.
     # def test_handle_consent_sets_flags_and_returns_chat(self):
     #     responses = [
     #         {"name": "node_id", "value": "start"},
@@ -53,7 +53,10 @@ class ConsentServiceTests(TestCase):
             }]
         }]
         set_user_consent_history(self.session_slug, history)
-        responses = [{"value": ["myself", "myChildChildren"]}]
+        responses = [
+                {"name": "checkbox_form", "value": ["myself", "myChildChildren"]},
+                {"name": "node_id", "value": "b5nYNf6"},
+                ]
         result = handle_family_enrollment_form(self.graph, self.session_slug, responses)
         self.assertIsInstance(result, list)
         self.user.refresh_from_db()

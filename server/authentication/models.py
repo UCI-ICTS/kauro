@@ -8,10 +8,10 @@ from django.db import models
 
 class UserManager(BaseUserManager):
     """User Manager
-    Custom manager for User model where email is the unique identifier instead of username. 
+    Custom manager for User model where email is the unique identifier instead of username.
     """
     def create_user(self, email, password=None, **extra_fields):
-    
+
         if not email:
             raise ValueError("The Email field must be set")
         email = self.normalize_email(email)
@@ -49,11 +49,11 @@ class User(AbstractUser):
     enrolling_children = models.BooleanField(default=False)
     num_children_enrolling = models.IntegerField(default=0)
     num_test_tries = models.IntegerField(default=1, null=True, blank=True)
-    
+
     # This tells Django to use email as the primary identifier
-    USERNAME_FIELD = "email"  
+    USERNAME_FIELD = "email"
     # Django still requires some fields to be set
-    REQUIRED_FIELDS = ["first_name", "last_name"]  
+    REQUIRED_FIELDS = ["first_name", "last_name"]
     # Assign the custom manager
     objects = UserManager()
 

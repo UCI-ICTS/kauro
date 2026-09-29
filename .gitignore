@@ -1,27 +1,45 @@
-#Frontend ignores
+#General
+*.python-version
+**.DS_Store**
+**__pycache__**
+*.swp
+maintenance/maintenance.flag
+
+#Server Items
+server/env*
+server/.python-version
+server/.secrets
+server/config/fixtures/local_data.json
+server/config/fixtures/full_local_data.json
+server/config/fixtures/dump.json
+server/dump.json
+server/egress
+server/env
+server/static*
+server/tests/results*
+server/tests/.coverage
+server/media*
+server/end_flow.json
+
+
+#Client Items
+#Client dependencies
 client/node_modules
-client/build
+client/.pnp
+client/.pnp.js
 client/.env
 
-#Backend ignores
-server/env
-**.DS_Store*
-**.pyc
-**/migrations/*.py
+#Client testing
+client/coverage
 
-# Ignore all static files
-server/static/*
+#Client production
+client/build
 
-# Except images
-!server/static/images/
-!server/static/images/**
-
-# Optional: still ignore unwanted hidden files
-server/static/.*
-
-server/.secrets
-docs/cache.txt
-docs/overhaul_notes
-server/family.json
-server/startTest.json
-server/media/pdfs/*
+#Client misc
+client/.env.local
+client/.env.development.local
+client/.env.test.local
+client/.env.production.local
+client/npm-debug.log*
+client/yarn-debug.log*
+client/yarn-error.log*

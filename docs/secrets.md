@@ -1,11 +1,11 @@
-# MIA `.secrets` Configuration
+# KAURO `.secrets` Configuration
 
 Below is an example configuration file. This file contains sensitive information and deployment specific settings. Example values and specific instructions are given in each of the respective [deployment](docs/deployment) instructions.
 
 See the [Django docs](https://docs.djangoproject.com/en/5.0/ref/settings/) for more specific details.
 ``` shell
 [DJANGO_KEYS]
-SECRET_KEY=my_secrete_key
+SECRET_KEY=my_secret_key
 
 [SERVER]
 DEBUG=True
@@ -18,7 +18,7 @@ EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
 
 [DATABASE]
 ENGINE=django.db.backends.postgresql
-NAME=mia_app_local
+NAME=kauro_app
 USER=postgres
 PASSWORD=postgres
 HOST=localhost
@@ -26,16 +26,16 @@ PORT=5432
 
 
 [STATIC]
-STATIC_URL=/PATH/TO/PROJECT/mia/server/static/
+STATIC_URL=/PATH/TO/PROJECT/kauro/server/static/
 STATIC_ROOT=static
-MEDIA_URL=/PATH/TO/PROJECT/mia/server/media/
+MEDIA_URL=/PATH/TO/PROJECT/kauro/server/media/
 MEDIA_ROOT=media
 ```
 
 
 ##  DJANGO_KEYS: Keys and Tokens for Django
 ### SECRET_KEY
-According to the Django docs the [SECRETE_KEY](https://docs.djangoproject.com/en/dev/ref/settings/#secret-key) is used for the following:
+According to the Django docs the [SECRET_KEY](https://docs.djangoproject.com/en/dev/ref/settings/#secret-key) is used for the following:
 - All sessions if you are using any other session backend than django.contrib.sessions.backends.cache, or are using the default get_session_auth_hash().
 - All messages if you are using CookieStorage or FallbackStorage.
 - All PasswordResetView tokens.

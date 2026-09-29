@@ -1,6 +1,6 @@
 ## Install with AWS Cloud Formation
 * Add your Github deploy secret key to AWS SecretsManager. Add the private key as plaintext.
-  * name the key /mia/ssh/key (if you change this name, you need to update the cloudformation template)
+  * name the key /kauro/ssh/key (if you change this name, you need to update the cloudformation template)
   * copy the ARN for the Secret into the cloudformation template
 * You need to create an ec2 keypair
 * Navigate to Cloud Formation and create a new stack using the template in this repo (with updated parameters)
@@ -9,18 +9,18 @@
 * Log into the ec2 instance (for simplicity I connected directly from the console)
 * Run the following commands:
 ```python
-cd /home/ubuntu/mia
+cd /home/ubuntu/kauro
 
-nano .miaenv
+nano .kauroenv
 # fill out this info and save the file (double check parameters are correct)
 FLASK_ENV=prd
 FLASK_RUN_HOST=<IP ADDRESS FOR EC2 INSTANCE>
 FLASK_RUN_PORT=5001
 SECRET_KEY=<ADD_A_SECRET_KEY (E.G., UUID)>
-PRD_DATABASE_URL=postgresql://pgadmin:<DATABASE_PASSWORD>@miaprdpostgresdb.cb6yykkuuahw.us-east-1.rds.amazonaws.com:5432/mia_app
+PRD_DATABASE_URL=postgresql://pgadmin:<DATABASE_PASSWORD>@kauroprdpostgresdb.cb6yykkuuahw.us-east-1.rds.amazonaws.com:5432/kauro_app
 # save the file
 
-sudo systemctl restart mia
+sudo systemctl restart kauro
 
 source/venv/bin/activate
 
@@ -48,9 +48,9 @@ exit
   * Configure a password for the default `postgres` user:
     * Open a psql shell with the postgres user with: `sudo -u postgres psql`.
     * At the `postgres=#` prompt, type `\password` to set the password for the default `postgres` user.
-    * Follow the prompts and enter the new password. Save it for the `.miaenv` config file.
-    * Create two databases `mia_app` and `test_db` in psql with:
-      * `CREATE DATABASE mia_app ;`
+    * Follow the prompts and enter the new password. Save it for the `.kauroenv` config file.
+    * Create two databases `kauro_app` and `test_db` in psql with:
+      * `CREATE DATABASE kauro_app ;`
       * `CREATE DATABASE test_db ;`
       * Don't forget the `;` after each SQL statement.
     * [Optional] If ufw (uncomplicated firewall) is enabled and running, allow ports 80 and 443 for the web server with:
@@ -58,7 +58,7 @@ exit
       * `sudo ufw allow 443/tcp`
 
 * git clone the repo
-  * Create a `.miaenv` file in the repo directory
+  * Create a `.kauroenv` file in the repo directory
   * Generate a secret key with `python3 -c "import os ; print(os.urandom(24)"`. Copy the string between the quotes.
   * The file should contain the following information:
   ```python
@@ -66,7 +66,7 @@ exit
   FLASK_RUN_HOST=0.0.0.0  # local IP address for the instance
   FLASK_RUN_PORT=[80 for testing without HTTPS, otherwise 443]
   SECRET_KEY=[change this key with the value above for client-side security]
-  DATABASE_URL=postgresql://postgres:postgres@localhost:5432/mia_app  # Change username:password@localhost accordingly to match what was set with psql earlier
+  DATABASE_URL=postgresql://postgres:postgres@localhost:5432/kauro_app  # Change username:password@localhost accordingly to match what was set with psql earlier
   TEST_DATABASE_URL=postgresql://postgres:postgres@localhost:5432/test_db  # Change username:password@localhost accordingly to match what was set with psql earlier
   DEV_DATABASE_URL=[ignored if local or prd is set]
   PRD_DATABASE_URL=[ignored if local or dev is set]
@@ -100,7 +100,7 @@ In [3]: db.session.commit()
 ## Run the application (in a new tab)
 ```python 
 source venv/bin/activate
-sudo venv/bin/python mia.py
+sudo venv/bin/python kauro.py
 
 # go to the admin page and login
 http://[aws-ec2-instance-ip-address]/admin/
