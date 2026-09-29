@@ -33,7 +33,7 @@ from authentication.services import (
     UserOutputSerializer,
     FollowUpInputSerializer,
     FollowUpOutputSerializer,
-    PasswordResetRequestSerializer, 
+    PasswordResetRequestSerializer,
     PasswordResetConfirmSerializer,
     ActivateUserSerializer
     )
@@ -270,7 +270,7 @@ class FollowUpVieWSet(viewsets.ViewSet):
         if self.action == 'create':
             return [permissions.AllowAny()]
         return [permissions.IsAuthenticated()]
-    
+
     @swagger_auto_schema(
         operation_description="Retrieve all follow ups",
         responses={200: UserOutputSerializer(many=True)},
@@ -283,7 +283,7 @@ class FollowUpVieWSet(viewsets.ViewSet):
         follow_ups = FollowUp.objects.all()
         serializer = FollowUpOutputSerializer(follow_ups, many=True)
         return Response(serializer.data)
-    
+
     @swagger_auto_schema(
         operation_description="Create a new follow-up entry",
         request_body=FollowUpInputSerializer,
@@ -309,12 +309,12 @@ class FollowUpVieWSet(viewsets.ViewSet):
     )
     @action(detail=True, methods=["put"], url_path="resolve")
     def resolve(self, request, pk=None):
-        
+
         try:
             instance = get_object_or_404(FollowUp, pk=pk)
         except Exception as err:
             return Response(data=err, status=status.HTTP_400_BAD_REQUEST)
-        
+
         if instance. resolved is True:
             return Response(data={"message": "Follow-up is already marked as resolved"}, status=status.HTTP_400_BAD_REQUEST)
         instance.resolved = True

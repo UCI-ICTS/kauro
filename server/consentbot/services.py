@@ -46,12 +46,12 @@ from utils.cache import (
     get_user_consent_history,
     set_user_consent_history,
     append_to_consent_history
-) 
+)
 
 from utils.email_helpers import send_html_email
 from utils.pdf_writers import generate_consent_pdf, generate_transcript_pdf
 
-User = get_user_model()  
+User = get_user_model()
 # flags
 TEST_QUESTIONS_CORRECT = 10
 NUM_TEST_TRIES = 2
@@ -121,7 +121,7 @@ class ConsentInputSerializer(serializers.ModelSerializer):
         guardian = User.objects.get(user_id=guardian_id) if guardian_id else None
 
         return Consent.objects.create(user=user, guardian=guardian, **validated_data)
-        
+
 
 class ConsentOutputSerializer(serializers.ModelSerializer):
     user_id = serializers.UUIDField(source='user.user_id', read_only=True)
@@ -186,7 +186,7 @@ class ConsentScriptOutputSerializer(serializers.ModelSerializer):
             "graph",
             "versions"
         ]
-    
+
     def get_graph(self, obj):
         view = self.context.get("view")
         if view and view.action == "retrieve" :
@@ -290,10 +290,10 @@ def run_post_consent_finalization(session_slug):
         session = get_and_validate_consent_session(session_slug=session_slug)
         session.expires_at = timezone.now() + timedelta(minutes=1)
         session.save(update_fields=["expires_at"])
-        
+
         # Generate transcript
         generate_transcript_pdf(session=session)
-        
+
         # Path to PDF directory
         pdf_dir = os.path.join(settings.MEDIA_ROOT, "pdfs", session_slug)
         attachments = []
@@ -362,13 +362,13 @@ def get_or_initialize_consent_history(session_slug: str):
     """
     Retrieve existing consent history for a given invite_id,
     or initialize it with the starting node and first chat sequence.
-    
+
     Raise error if session is expired or inactive.
 
     Returns:
         tuple: (history, just_created)
     """
-    
+
     history = get_user_consent_history(session_slug)
     if history:
         return history, False
@@ -414,7 +414,7 @@ def update_consent_and_advance(session_slug, node_id, graph, user_reply: str, ne
     bot_block = get_next_chat_block(next_node_id, session_slug, graph=graph)
     for turn in bot_block["chat_turns"]:
         append_to_consent_history(session_slug, turn)
-    
+
     # Check final node for 'deactivate_session'
     final_turn = bot_block["chat_turns"][-1] if bot_block["chat_turns"] else None
     if final_turn['metadata']['workflow'] == "deactivate_session":
@@ -425,7 +425,7 @@ def update_consent_and_advance(session_slug, node_id, graph, user_reply: str, ne
 
 def handle_sample_storage(graph, session_slug, responses):
     data = {r["name"]: r["value"] for r in responses}
-    consent = get_and_validate_consent_session(session_slug=session_slug).consent 
+    consent = get_and_validate_consent_session(session_slug=session_slug).consent
     consent.store_sample_this_study = True
     consent.store_sample_other_studies = data.get("radio_selection") == 'storeSamplesOtherStudies'
     consent.save()
@@ -435,7 +435,7 @@ def handle_sample_storage(graph, session_slug, responses):
 
 def handle_phi_use(graph, session_slug, responses):
     data = {r["name"]: r["value"] for r in responses}
-    consent = get_and_validate_consent_session(session_slug=session_slug).consent 
+    consent = get_and_validate_consent_session(session_slug=session_slug).consent
     consent.store_phi_this_study = True
     consent.store_phi_other_studies = data.get("radio_selection") == "storePhiOtherStudies"
     consent.save()
@@ -446,7 +446,7 @@ def handle_phi_use(graph, session_slug, responses):
 def handle_result_return(graph, session_slug, responses):
     response_dict = {r["name"]: r["value"] for r in responses}
     node_id = response_dict["node_id"]
-    consent = get_and_validate_consent_session(session_slug=session_slug).consent 
+    consent = get_and_validate_consent_session(session_slug=session_slug).consent
     consent.return_primary_results = (response_dict.get("rorPrimary") == "yes")
     consent.return_actionable_secondary_results = (response_dict.get("rorSecondary") == "yes")
     consent.return_secondary_results = (response_dict.get("rorSecondaryNot") == "yes")
@@ -494,7 +494,7 @@ def handle_consent(graph, session_slug, responses):
         else:
             consent.consent_statements = "\n".join(description)
         user.consent_complete = True
-        
+
         generate_consent_pdf(consent, session)
 
         user.save()
@@ -528,7 +528,7 @@ def handle_consent(graph, session_slug, responses):
             else:
                 consent.consent_statements = "\n".join(description)
             consent.user.consent_complete = True
-            
+
             generate_consent_pdf(consent, session)
             consent.user.save()
             consent.save()
@@ -634,8 +634,8 @@ def handle_family_enrollment_form(graph: dict, session_slug: str, responses: lis
         )
         for turn in bot_block.get("chat_turns", []):
             append_to_consent_history(session_slug, turn)
-    
-    if enrolling_adult_family_member and adult_family_member_node_id:    
+
+    if enrolling_adult_family_member and adult_family_member_node_id:
         # If adult branch and children branch both selected:
         # go adult now, stash children for later.
         if user.enrolling_children and children_node_id:
@@ -644,7 +644,7 @@ def handle_family_enrollment_form(graph: dict, session_slug: str, responses: lis
                 key=ENROLL_CHILDREN_NEXT_NODE_KEY,
                 value=children_node_id
             )
-        
+
         bot_block = get_next_chat_block(
             node_id=adult_family_member_node_id,
             session_slug=session_slug,
@@ -652,7 +652,7 @@ def handle_family_enrollment_form(graph: dict, session_slug: str, responses: lis
         )
         for turn in bot_block.get("chat_turns", []):
             append_to_consent_history(session_slug, turn)
-        
+
         return get_user_consent_history(session_slug)
     if user.enrolling_children and children_node_id:
         bot_block = get_next_chat_block(
@@ -662,7 +662,7 @@ def handle_family_enrollment_form(graph: dict, session_slug: str, responses: lis
         )
         for turn in bot_block.get("chat_turns", []):
             append_to_consent_history(session_slug, turn)
-        
+
     return get_user_consent_history(session_slug)
 
 
@@ -836,7 +836,7 @@ def handle_other_adult_contact_form(conversation_graph, session_slug, responses)
             "script_id": session.user.consent_script_id,
             "is_active": False,
         }
-        
+
         user = UserInputSerializer().create(validated_data)
         new_user_data = UserOutputSerializer(user).data
 
@@ -859,7 +859,7 @@ def handle_other_adult_contact_form(conversation_graph, session_slug, responses)
         timestamp=timezone.now().isoformat()
     )
     append_to_consent_history(session_slug, user_turn)
-    
+
     # ---- Advance to the next node AFTER this form ----
     next_nodes = conversation_graph[node_id].get("child_ids") or []
     if not next_nodes:
@@ -914,7 +914,7 @@ def traverse(conversation_graph, start_id, metadata_field=None):
 
 def process_test_question(conversation_graph, current_node_id, session_slug):
     node_metadata = conversation_graph.get(current_node_id, {}).get("metadata", {})
-    
+
     if node_metadata.get("workflow") != "test_user_understanding":
         return ''
     try:
@@ -934,22 +934,22 @@ def process_test_question(conversation_graph, current_node_id, session_slug):
         # Save this question/response to the attempt
         is_correct = save_test_question(conversation_graph, current_node_id, attempt)
         eval_id = get_next_retry_question_node(attempt)
-        
+
         # Wrong answer on retry? Evaluate
         if is_correct is False and user.num_test_tries == 2:
             return evaluate_attempt(user, attempt, conversation_graph)
-        
+
         # Retry complete? Evaluate
         if user.num_test_tries == 2 and eval_id is None:
             return evaluate_attempt(user, attempt, conversation_graph)
-        
+
         # Final question? Evaluate
         if node_metadata.get("end_sequence") is True:
             return evaluate_attempt(user, attempt, conversation_graph)
 
     except ConsentSession.DoesNotExist:
         return node_metadata.get("fail_node_id", "")
-    
+
     except Exception as e:
         import logging
         logger = logging.getLogger(__name__)
@@ -1065,7 +1065,7 @@ def handle_child_enroll_form(graph:dict, session_slug:str, responses:dict)-> lis
     node_id = data["node_id"]
     node = graph.get(node_id, {})
     user_reply = f"I am enrolling {data['numChildrenEnroll']} children."
-    
+
     if int(data['numChildrenEnroll']) > 3:
         next_node_id = node.get("metadata").get("enrolling_four_or_more")
 
@@ -1073,7 +1073,7 @@ def handle_child_enroll_form(graph:dict, session_slug:str, responses:dict)-> lis
     user = session.user
     user.num_children_enrolling = data['numChildrenEnroll']
     user.save()
-    
+
     return update_consent_and_advance(session_slug, node_id, graph, user_reply, next_node_id)
 
 
@@ -1091,7 +1091,7 @@ def handle_child_contact_form(graph, session_slug, responses):
     guardian = session.user
 
     response_dict = {r.get("name"): r.get("value") for r in responses if r.get("name")}
-    
+
     bot_node_id = response_dict.get("node_id")
     user_node_id = graph[bot_node_id]["parent_ids"][0]
 
@@ -1192,8 +1192,8 @@ def handle_user_step(session_slug: str, node_id: str, graph: dict) -> list[dict]
         messages=[user_label]
     )
     append_to_consent_history(session_slug, user_turn)
-    
-    
+
+
     # Return user + bot turn history
     bot_block = get_next_chat_block(next_node_id, session_slug, graph=graph)
 
@@ -1207,7 +1207,7 @@ def handle_user_step(session_slug: str, node_id: str, graph: dict) -> list[dict]
             for turn in queued_block.get("chat_turns", []):
                 append_to_consent_history(session_slug, turn)
             return get_user_consent_history(session_slug)
-    
+
     for turn in bot_block["chat_turns"]:
         append_to_consent_history(session_slug, turn)
 
@@ -1217,7 +1217,7 @@ def handle_user_step(session_slug: str, node_id: str, graph: dict) -> list[dict]
         session.visited_nodes.append(session.current_node)
     session.responses[node_id] = user_label
     session.save(update_fields=["current_node", "visited_nodes", "responses"])
-    
+
         # Check final node for 'deactivate_session'
     final_turn = bot_block["chat_turns"][-1] if bot_block["chat_turns"] else None
     if final_turn['metadata']['workflow'] == "deactivate_session":
@@ -1247,7 +1247,7 @@ def process_user_consent(graph: dict, node_id: str, session_slug: str) -> Option
         raise ValueError("Consent object is missing for user.")
 
     if workflow in ["start_consent", "end_consent"]:
-        
+
         # Self-consent path
         if user.enrolling_myself and not user.consent_complete:
             consent.consent_age_group = ConsentAgeGroup.EIGHTEEN_AND_OVER
@@ -1260,7 +1260,7 @@ def process_user_consent(graph: dict, node_id: str, session_slug: str) -> Option
 
         # Child consent path
         if user.enrolling_children:
-            # Consent for children is handled 
+            # Consent for children is handled
             return metadata.get("enrolling_children_node_id")
 
     if workflow == "decline_consent":
@@ -1318,14 +1318,14 @@ def handle_form_submission(data):
     graph = get_script_from_session_slug(session_slug)
 
     handler = FORM_HANDLER_MAP.get(form_type)
-    
+
     if not handler:
         raise ValueError(f"Unknown form_type: {form_type}")
 
     history = handler(graph, session_slug, responses)
 
     render = history[-1]['render']
-    
+
     return history, render
 
 

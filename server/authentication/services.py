@@ -72,7 +72,7 @@ class UserInputSerializer(serializers.ModelSerializer):
 
         user.save()
         return user
-   
+
 
 class UserOutputSerializer(serializers.ModelSerializer):
     """
@@ -107,9 +107,9 @@ class UserOutputSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            'username', 'first_name', 'last_name', 'email', 'is_staff', 'date_joined', 
+            'username', 'first_name', 'last_name', 'email', 'is_staff', 'date_joined',
             'phone', 'consent_name', 'consent_complete', 'first_test_score', 'test_tries',
-            'invite_expired', 'consent_age_group', 'created_at', 'script_id' 
+            'invite_expired', 'consent_age_group', 'created_at', 'script_id'
         ]
 
     def get_first_test_score(self, user):
@@ -122,7 +122,7 @@ class UserOutputSerializer(serializers.ModelSerializer):
     def get_consent_age_group(self, user):
         consent = get_latest_consent(user)
         if consent and consent.consent_age_group:
-            return consent.consent_age_group  
+            return consent.consent_age_group
         return None
 
     def get_consent_name(self, user):
@@ -141,7 +141,7 @@ class UserOutputSerializer(serializers.ModelSerializer):
 class FollowUpInputSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(write_only=True)
 
-    class Meta: 
+    class Meta:
         model = FollowUp
         fields = ['email', 'follow_up_reason', 'follow_up_info']  # exclude 'user', 'resolved', etc.
 
@@ -157,7 +157,7 @@ class FollowUpInputSerializer(serializers.ModelSerializer):
 
 
 class FollowUpOutputSerializer(serializers.ModelSerializer):
-    class Meta: 
+    class Meta:
         model = FollowUp
         fields = [
             'user_follow_up_id',
@@ -171,7 +171,7 @@ class FollowUpOutputSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         data = super().to_representation(instance)
         user = instance.user
-        
+
         # Flatten user fields into the top level
         data['user_id'] = user.user_id
         data['first_name'] = user.first_name

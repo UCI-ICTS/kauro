@@ -9,7 +9,7 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 class AuthApiTests(TestCase):
-    fixtures = ["tests/fixtures/test_data.json"]
+    fixtures = ["tests/fixtures/initial.json"]
 
     def setUp(self):
         self.client = APIClient()
@@ -89,7 +89,7 @@ class AuthApiTests(TestCase):
             "new_password": "newsecurepassword123",
             "confirm_new_password": "newsecurepassword123"
         }, format="json")
-        
+
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data["old_password"][0], "Incorrect password")
 

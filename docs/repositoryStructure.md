@@ -1,7 +1,7 @@
 # Code Structure and Reasoning
 
 ## Overview
-MIA is a web app built with Django on the backend and React on the frontend. It's designed to manage personalized consent workflows, user authentication, and follow-up tracking. The system includes tools for both participants and administrators, making it easier to handle consent, feedback, and user management in one place.
+KAURO is a web app built with Django on the backend and React on the frontend. It's designed to manage personalized consent workflows, user authentication, and follow-up tracking. The system includes tools for both participants and administrators, making it easier to handle consent, feedback, and user management in one place.
 
 ## Reasoning for Structure
 1. Separation of Concerns:

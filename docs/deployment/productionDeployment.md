@@ -27,7 +27,7 @@ sudo dnf install nginx -y
     dnf list installed | grep postgresql
 
 - depending on the output:
-  - if a `psql` instance is present (15.0 >) use that. For example if `postgresql15.x86_64` then 
+  - if a `psql` instance is present (15.0 >) use that. For example if `postgresql15.x86_64` then
 ```bash
     sudo dnf install -y postgresql15 postgresql15-server postgresql15-contrib
 ```
@@ -41,7 +41,7 @@ sudo dnf install nginx -y
 #### 3.5 Check the status of the PostgreSQL service
     sudo systemctl status postgresql
 ### 4. Configure a password for the default `postgres` user
-* Open a psql shell with the postgres user 
+* Open a psql shell with the postgres user
 ```bash
 sudo -u postgres psql
 ```
@@ -49,11 +49,11 @@ sudo -u postgres psql
     * Follow the prompts and enter the new password. Save it somewhere safe (you will need it for your `.secrets` file later).
 ### 5. Create the Kauro database and exit psql
 ```bash
-CREATE DATABASE mia_app;
+CREATE DATABASE kauro_app;
 \q
 ```
 
-### 6. Allow password authentication for `postgres` 
+### 6. Allow password authentication for `postgres`
 - Open the pg_hba.conf file:
 ```bash
 sudo vim /var/lib/pgsql/data/pg_hba.conf
@@ -90,39 +90,39 @@ sudo mkdir /var/www/github
 sudo chown -R ec2-user:developers /var/www/github/
 cd /var/www/github/
 ```
-- For HTTPS access: 
+- For HTTPS access:
 
-		git clone https://github.com/UCI-ICTS/mia/
+        git clone https://github.com/UCI-ICTS/kauro/
 
-- For SSH access*(RECCOMENDED if you have [SSH keys](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent) set up)*: 
+- For SSH access*(RECCOMENDED if you have [SSH keys](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent) set up)*:
 
-		git clone git@github.com:UCI-ICTS/mia.git
+        git clone git@github.com:UCI-ICTS/kauro.git
 
 **Then**
 
-	cd mia/
+    cd kauro/
 
 **If you need to use a branch other than `dev`(the main branch):**
 
 `git switch <BRANCH NAME>` *(for whatever branch you need)*
 
-## Kauro Client deployment  (mia/client)
+## Kauro Client deployment  (kauro/client)
 
 ### Enter the repository, create a environment file, and install the required packages
 
-	cd /var/www/github/mia/client/
+    cd /var/www/github/kauro/client/
 
 **Install Node packages via Node Package Manager (NPM)**
 
-	npm install
+    npm install
 
 ### Build the production deployment
 ```bash
 npm run build
 ```
 
-### Update the `.env` file with the required keys: 
-	cp .env.example .env
+### Update the `.env` file with the required keys:
+    cp .env.example .env
 
 The values for production should be:
 ```
@@ -130,26 +130,26 @@ REACT_APP_BASEURL=http://[SERVERNAME]
 REACT_APP_KBIDB=http://[SERVERNAME]
 ```
 
-## Kauro Server deployment  (mia/server)
+## Kauro Server deployment  (kauro/server)
 
 **Open a new terminal and retrun to the project root**
 
-	cd /var/www/github/mia/server
+    cd /var/www/github/kauro/server
 
 ### Enter the server directory, create a virtual environment, and install the required packages
 
 ##### *[pyenv is optional, but can be usefull if there are multiple apps and python versions being used](https://github.com/pyenv/pyenv?tab=readme-ov-file#simple-python-version-management-pyenv)*
 
-	python3.11 -m venv env
-	source env/bin/activate
-	pip install -r requirements.txt
+    python3.11 -m venv env
+    source env/bin/activate
+    pip install -r requirements.txt
 
 ### Generate the secrets file
 ----
 
 - Copy the `.secrets.example` to `.secrets`
 
-		cp .secrets.example .secrets
+        cp .secrets.example .secrets
 
 - The `.secrets.example` is set up to run on a local deployment with out modifications. To update the `.secrets` file the required keys are described here: [secrets.md](../secrets.md)
 ##### *The `EMAIL_BACKEND` should be set to `'django.core.mail.backends.smtp.EmailBackend'` IF you have a [mail server configured](https://medium.com/dajngo/email-configuration-in-django-3c7d9e149445). Otherwise leave the default and the email content will be sent to the log files.*
@@ -168,7 +168,7 @@ python3 -c 'from django.core.management.utils import get_random_secret_key; prin
 | `[SERVER]`      | `DEBUG`                 | `False` |
 | `[SERVER]`      | `ALLOWED_HOSTS`         | `your-server-public-ip,localhost,127.0.0.1` (replace `your-server-public-ip`) |
 | `[DATABASE]`    | `ENGINE`                | `django.db.backends.postgresql` |
-| `[DATABASE]`    | `NAME`                  | `mia_app` |
+| `[DATABASE]`    | `NAME`                  | `kauro_app` |
 | `[DATABASE]`    | `USER`                  | `postgres` |
 | `[DATABASE]`    | `PASSWORD`              | the password you just set for the `postgres` user |
 | `[DATABASE]`    | `HOST`                  | `localhost` |
@@ -176,12 +176,12 @@ python3 -c 'from django.core.management.utils import get_random_secret_key; prin
 
 ### Create a DB:
 
-	python manage.py migrate
+    python manage.py migrate
 ---
 ### Optional: Load DB with test fixture data
 Load the DB with test data:
 
-	python manage.py loaddata config/fixtures/initial.json
+    python manage.py loaddata config/fixtures/initial.json
 ---
 
 ### Collect static files:
@@ -198,15 +198,15 @@ sudo chown -R nginx:developers /var/log/gunicorn
 ### Create a Gunicorn systemd Service and Socet for MIA
 Set up a `systemd` service so Gunicorn runs the Django Kauro backend at boot and stays running.
 ```bash
-sudo cp ../admin/mia.service /etc/systemd/system/mia.service
-sudo cp /var/www/github/mia/admin/mia.socket /etc/systemd/system/mia.socket
-sudo chown nginx:developers /var/run/mia.sock
+sudo cp ../admin/kauro.service /etc/systemd/system/kauro.service
+sudo cp /var/www/github/kauro/admin/kauro.socket /etc/systemd/system/kauro.socket
+sudo chown nginx:developers /var/run/kauro.sock
 ```
 Things to check carefully:
 - WorkingDirectory — where your Django manage.py lives.
 - Environment — path to your virtual environment's bin/.
 - ExecStart — run gunicorn, binding to a socket file .sock.
-- User/group - the default user is `nginx` but you may need to change this. 
+- User/group - the default user is `nginx` but you may need to change this.
 
 #### Reload systemd so it knows about your new service:
 
@@ -217,43 +217,43 @@ sudo systemctl daemon-reload
 #### Start Gunicorn:
 
 ```bash
-sudo systemctl start mia
+sudo systemctl start kauro
 ```
 
 #### Enable it to auto-start on reboot:
 ```bash
-sudo systemctl enable mia
+sudo systemctl enable kauro
 ```
 #### Check Gunicorn status:
 ```bash
-sudo systemctl status mia
+sudo systemctl status kauro
 ```
 
 It should say **active (running)**:
 ```bash
-● mia.service - Kauro gunicorn daemon
-     Loaded: loaded (/etc/systemd/system/mia.service; enabled; preset: disabled)
+● kauro.service - Kauro gunicorn daemon
+     Loaded: loaded (/etc/systemd/system/kauro.service; enabled; preset: disabled)
      Active: active (running) since Tue 2025-04-29 13:25:07 UTC; 3min 20s ago
-TriggeredBy: ● mia.socket
+TriggeredBy: ● kauro.socket
    Main PID: 97545 (python)
       Tasks: 4 (limit: 1111)
      Memory: 113.7M
         CPU: 822ms
-     CGroup: /system.slice/mia.service
-             ├─97545 /var/www/github/mia/server/env/bin/python /var/www/github/mia/server/env/bin/gunicorn --access-logfile /var/log/gunicorn/mia_stdout.log --log-level=debug --log-file /var/log/gunicorn/mia_stderr.log --workers 3 --bind unix:/var/run/mia.sock config.wsgi:applicati>
-             ├─97553 /var/www/github/mia/server/env/bin/python /var/www/github/mia/server/env/bin/gunicorn --access-logfile /var/log/gunicorn/mia_stdout.log --log-level=debug --log-file /var/log/gunicorn/mia_stderr.log --workers 3 --bind unix:/var/run/mia.sock config.wsgi:applicati>
-             ├─97554 /var/www/github/mia/server/env/bin/python /var/www/github/mia/server/env/bin/gunicorn --access-logfile /var/log/gunicorn/mia_stdout.log --log-level=debug --log-file /var/log/gunicorn/mia_stderr.log --workers 3 --bind unix:/var/run/mia.sock config.wsgi:applicati>
-             └─97555 /var/www/github/mia/server/env/bin/python /var/www/github/mia/server/env/bin/gunicorn --access-logfile /var/log/gunicorn/mia_stdout.log --log-level=debug --log-file /var/log/gunicorn/mia_stderr.log --workers 3 --bind unix:/var/run/mia.sock config.wsgi:applicati>
+     CGroup: /system.slice/kauro.service
+             ├─97545 /var/www/github/kauro/server/env/bin/python /var/www/github/kauro/server/env/bin/gunicorn --access-logfile /var/log/gunicorn/kauro_stdout.log --log-level=debug --log-file /var/log/gunicorn/kauro_stderr.log --workers 3 --bind unix:/var/run/kauro.sock config.wsgi:applicati>
+             ├─97553 /var/www/github/kauro/server/env/bin/python /var/www/github/kauro/server/env/bin/gunicorn --access-logfile /var/log/gunicorn/kauro_stdout.log --log-level=debug --log-file /var/log/gunicorn/kauro_stderr.log --workers 3 --bind unix:/var/run/kauro.sock config.wsgi:applicati>
+             ├─97554 /var/www/github/kauro/server/env/bin/python /var/www/github/kauro/server/env/bin/gunicorn --access-logfile /var/log/gunicorn/kauro_stdout.log --log-level=debug --log-file /var/log/gunicorn/kauro_stderr.log --workers 3 --bind unix:/var/run/kauro.sock config.wsgi:applicati>
+             └─97555 /var/www/github/kauro/server/env/bin/python /var/www/github/kauro/server/env/bin/gunicorn --access-logfile /var/log/gunicorn/kauro_stdout.log --log-level=debug --log-file /var/log/gunicorn/kauro_stderr.log --workers 3 --bind unix:/var/run/kauro.sock config.wsgi:applicati>
 ```
 
-### Create the Nginx config for mia
+### Create the Nginx config for kauro
 We set up Nginx to proxy to the Gunicorn socket. There are two example files:
-1. admin/mia_nocert.conf: for deployment with no server certification
-2. admin/mia.conf: for deployment with server certification
+1. admin/kauro_nocert.conf: for deployment with no server certification
+2. admin/kauro.conf: for deployment with server certification
 
 #### Copy your updated file to the system Nginx conf and test:
 ```bash
-sudo cp mia/admin/mia.conf /etc/nginx/conf.d/mia.conf
+sudo cp kauro/admin/kauro.conf /etc/nginx/conf.d/kauro.conf
 sudo nginx -t
 ```
 
@@ -263,11 +263,11 @@ Make sure API is accessible via web browser.
 
 If it worked you should be able to see the API Documentation site at:
 
-`http://[public IP or domain]/mia/swagger/`
+`http://[public IP or domain]/kauro/swagger/`
 
 and the Admin site at:
 
-`http://[public IP or domain]/mia/django-admin/`
+`http://[public IP or domain]/kauro/django-admin/`
 
 Use the following credentials to log in if you loaded the test data:
 
