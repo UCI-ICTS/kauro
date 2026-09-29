@@ -51,8 +51,8 @@ DEFAULT_FROM_EMAIL = secrets.get("EMAIL", "DEFAULT_FROM_EMAIL", fallback="")
 # DATABASE settings
 ENGINE=secrets.get("DATABASE", "ENGINE", fallback="django.db.backends.postgresql")
 NAME=secrets.get("DATABASE", "NAME", fallback="kauro_app")
-USER=secrets.get("DATABASE", "USER", fallback="kaurouser")
-PASSWORD=secrets.get("DATABASE", "PASSWORD", fallback="kaurouser")
+USER=secrets.get("DATABASE", "USER", fallback="postgres")
+PASSWORD=secrets.get("DATABASE", "PASSWORD", fallback="postgres")
 HOST=secrets.get("DATABASE", "HOST", fallback="localhost") # Or your PostgreSQL server
 PORT=secrets.get("DATABASE", "PORT", fallback="5432") # Default PostgreSQL port
 
